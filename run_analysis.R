@@ -58,18 +58,36 @@ testdata <- read.table("UCI HAR Dataset/test/X_test.txt",
 traindata <- read.table("UCI HAR Dataset/train/X_train.txt",
 		header=FALSE,row.names=NULL)
 
-##  Add the subject and activity codes to the datasets loaded
-testdata$subject <- testsub
-traindata$subject <- trainsub
-testdata$activity <- testactivity
-traindata$activity <- trainactivity
-
+# not needed due to rbind issue
+## set the rownames in the train and test datasets
+# tempvec <- paste("train_",rownames(traindata), sep ="")
+# rownames(traindata) <- tempvec
+# tempvec <- paste("test_",rownames(testdata), sep ="")
+# rownames(testdata) <- tempvec
 
 ##  Combine the test and train datasets into a single combined dataset
-fulldata <- rbind(traindata,testdata)
-str(traindata)
-str(testdata)
-str(fulldata)
+# fulldata <- rbind(traindata,testdata)
+## working around an unexpected issue with rbind
+message("convert formats to work around rbind issue")
+trainmatrix <- as.matrix(traindata)
+testmatrix <- as.matrix(testdata)
+message("rbind start")
+fullmatrix <- rbind(traindata,testdata)
+message("convert to data.frame")
+fulldata <- data.frame(fullmatrix)
+
+##  Add the subject and activity codes to the datasets loaded
+message("add subject ID to dataset")
+# fulldata$subject <- c(as.vector(trainsub),as.vector(testsub))
+fulldata$subject <- rbind(trainsub,testsub)
+message("add activity key to dataset")
+fulldata$activity <- rbind(trainactivity, testactivity)
+
+message("rbind complete")
+# str(traindata)
+# str(testdata)
+# str(fulldata)
+summary(fulldata)
 
 
 }
